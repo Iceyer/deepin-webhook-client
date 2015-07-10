@@ -70,6 +70,26 @@ func (p *Publisher) CreateEvent(event, secret string, schema map[string]interfac
 	return &e, err
 }
 
+func (p *Publisher) DeleteEvent(event string) (*Event, error) {
+	url := p.api() + fmt.Sprintf("/events/%s/%s", p.publisher, event)
+	req, _ := http.NewRequest("DELETE", url, nil)
+	req.Header.Set("Access-Token", p.hookClient.token)
+	client := http.Client{}
+	rsp, err := client.Do(req)
+	if nil != err || nil == rsp {
+		return nil, err
+	}
+
+	retdata, _ := ioutil.ReadAll(rsp.Body)
+	if rsp.StatusCode != http.StatusOK {
+		return nil, fmt.Errorf(string(retdata))
+	}
+
+	e := Event{}
+	err = json.Unmarshal(retdata, &e)
+	return &e, err
+}
+
 func (p *Publisher) PublishEvent(event string, data interface{}) error {
 	_, err := p.postData(p.api()+"/events/"+p.publisher+"/"+event, data)
 	if nil != err {
