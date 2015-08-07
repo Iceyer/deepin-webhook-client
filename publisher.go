@@ -39,6 +39,22 @@ func (p *Publisher) CreateEvent(event, secret string, schema map[string]interfac
 	return &e, err
 }
 
+//https://hook.deepin.org/v0/event/:publisher/:event
+func (p *Publisher) UpdateEvent(event string, e Event) (*Event, error) {
+	ejson := map[string](interface{}){
+		"name":      e.Name,
+		"publisher": e.Publisher,
+		"secret":    e.Secret,
+	}
+	data, _ := json.Marshal(ejson)
+	data, err := p.putData(p.api()+"/events/"+p.publisher+"/"+event, data)
+
+	ne := Event{}
+	err = json.Unmarshal(data, &ne)
+	return &ne, err
+
+}
+
 func (p *Publisher) DeleteEvent(event string) (*Event, error) {
 	url := p.api() + fmt.Sprintf("/events/%s/%s", p.publisher, event)
 	req, _ := http.NewRequest("DELETE", url, nil)

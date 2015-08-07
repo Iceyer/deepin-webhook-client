@@ -31,3 +31,9 @@ func (s *Subscriber) Subscribe(publisher, event, callback string) (*Subscriber, 
 	err = json.Unmarshal(retData, s)
 	return s, err
 }
+
+//DELETE https://hook.deepin.org/v0/events/:publisher/:event/subscribers/:id
+func (s *Subscriber) Delete(publisher, event, id string) error {
+	_, err := s.deleteData(s.api() + "/events/" + publisher + "/" + event + "/subscribers/" + id)
+	return err
+}

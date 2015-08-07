@@ -46,6 +46,16 @@ func NewHookClient(host, ver, token string) *HookClient {
 	}
 }
 
+func (c *HookClient) putData(url string, jsondata []byte) ([]byte, error) {
+	req, _ := http.NewRequest("PUT", url, bytes.NewBuffer(jsondata))
+	return do(req, c.token)
+}
+
+func (c *HookClient) deleteData(url string) ([]byte, error) {
+	req, _ := http.NewRequest("DELETE", url, nil)
+	return do(req, c.token)
+}
+
 func (c *HookClient) getData(url string) ([]byte, error) {
 	fmt.Println(url)
 	req, _ := http.NewRequest("GET", url, nil)
