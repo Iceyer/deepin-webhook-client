@@ -19,11 +19,19 @@ func init() {
 }
 
 func TestPublisher(t *testing.T) {
-	serverHost := "http://10.0.4.226:8010"
+	serverHost := "http://hook.deepin.test"
 
+	HookClient := HookClient{
+		host:  serverHost,
+		ver:   "v0",
+		token: "OWNjN2QyMTMtMWRmNC00N",
+	}
+	es, err := HookClient.ListEvent()
+	t.Log(err, es)
+	return
 	//Create Event
 	p := NewPublisher(serverHost, "v0", "repo", "OWNjN2QyMTMtMWRmNC00N")
-	_, err := p.CreateEvent("app_create", "123456", nil)
+	_, err = p.CreateEvent("app_create", "123456", nil)
 	t.Log(err)
 
 	//Subscribe Event

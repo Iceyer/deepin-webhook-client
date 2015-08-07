@@ -9,12 +9,12 @@ type Subscriber struct {
 	Callback string `json:"callback"`
 	EventID  string `json:"event_id"`
 
-	hookClient
+	HookClient
 }
 
 func NewSubscriber(host, apiVer, token string) *Subscriber {
 	return &Subscriber{
-		hookClient: hookClient{
+		HookClient: HookClient{
 			host:  host,
 			ver:   apiVer,
 			token: token,

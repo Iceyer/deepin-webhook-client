@@ -1,58 +1,27 @@
 package client
 
 import (
-	"bytes"
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
 	"net/http"
 )
 
-type hookClient struct {
-	token string
-	host  string
-	ver   string
-}
-
 type Publisher struct {
 	publisher string
-	hookClient
+	HookClient
 }
 
 func NewPublisher(host, apiVer, publisher, token string) *Publisher {
 	return &Publisher{
 		publisher: publisher,
-		hookClient: hookClient{
+		HookClient: HookClient{
 			host:  host,
 			ver:   apiVer,
 			token: token,
 		},
 	}
 
-}
-
-func (c *hookClient) postData(url string, data interface{}) ([]byte, error) {
-	jdata, _ := json.Marshal(data)
-	req, _ := http.NewRequest("POST", url, bytes.NewBuffer(jdata))
-	req.Header.Set("Content-Type", "application/json")
-	req.Header.Set("Access-Token", c.token)
-
-	client := http.Client{}
-	rsp, err := client.Do(req)
-	if nil != err || nil == rsp {
-		return nil, err
-	}
-
-	retdata, _ := ioutil.ReadAll(rsp.Body)
-	if rsp.StatusCode != http.StatusOK {
-		return nil, fmt.Errorf(string(retdata))
-	}
-
-	return retdata, nil
-}
-
-func (p *hookClient) api() string {
-	return p.host + "/" + p.ver
 }
 
 func (p *Publisher) CreateEvent(event, secret string, schema map[string]interface{}) (*Event, error) {
@@ -73,7 +42,7 @@ func (p *Publisher) CreateEvent(event, secret string, schema map[string]interfac
 func (p *Publisher) DeleteEvent(event string) (*Event, error) {
 	url := p.api() + fmt.Sprintf("/events/%s/%s", p.publisher, event)
 	req, _ := http.NewRequest("DELETE", url, nil)
-	req.Header.Set("Access-Token", p.hookClient.token)
+	req.Header.Set("Access-Token", p.HookClient.token)
 	client := http.Client{}
 	rsp, err := client.Do(req)
 	if nil != err || nil == rsp {
